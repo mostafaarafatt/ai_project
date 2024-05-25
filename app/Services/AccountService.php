@@ -13,12 +13,8 @@ class AccountService
 {
     public function register(array $data)
     {
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'is_verified' => false,
-        ]);
+        $data['password'] = Hash::make($data['password']);
+        $user = User::create($data);
 
         $this->generateVerificationCode($user->email);
 

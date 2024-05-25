@@ -27,8 +27,8 @@ Route::post('reset-password', [AccountController::class, 'resetPassword']);
 Route::post('verify-email', [AccountController::class, 'verifyEmail']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::post('logout', [AccountController::class, 'logout']);
-    Route::get('user', [AccountController::class, 'user']);
+    Route::get('logout', [AccountController::class, 'logout']);
+    Route::get('get-user', [AccountController::class, 'getUser']);
 
     Route::get('/predict-disease', [DiseasePredictionController::class, 'predictDisease']);
 });

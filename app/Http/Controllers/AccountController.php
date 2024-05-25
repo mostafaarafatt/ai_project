@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\AccountService;
 use Illuminate\Http\Request;
@@ -21,6 +22,8 @@ class AccountController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'age' => 'required|integer|min:8',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
             'password' => 'required|string|min:8',
         ]);
 
@@ -30,9 +33,13 @@ class AccountController extends Controller
 
         $user = $this->accountService->register($request->all());
 
+        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+            $user->addMediaFromRequest('avatar')->toMediaCollection('avatar');
+        }
+
         return response()->json([
             'message' => 'User registered successfully. Verification code sent to your email.',
-            'user' => $user,
+            'user' => new UserResource($user),
         ], 201);
     }
 
@@ -62,6 +69,7 @@ class AccountController extends Controller
         return response()->json([
             'message' => 'Login successful',
             'token' => $token,
+            'user' => new UserResource($user),
         ]);
     }
 
@@ -90,7 +98,7 @@ class AccountController extends Controller
 
         $this->accountService->markVerificationCodeAsUsed($verificationCode);
 
-        return response()->json(['message' => 'Email verified successfully']);
+        return response()->json(['message' => 'Email verified successfully', 'user' => new UserResource($user)]);
     }
 
     public function forgotPassword(Request $request)
@@ -109,9 +117,9 @@ class AccountController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        $this->accountService->generateVerificationCode($email);
+        $code = $this->accountService->generateVerificationCode($email);
 
-        return response()->json(['message' => 'Password reset code sent to your email']);
+        return response()->json(['message' => 'Password reset code sent to your email', 'code' => $code]);
     }
 
     public function resetPassword(Request $request)
@@ -151,8 +159,11 @@ class AccountController extends Controller
         return response()->json(['message' => 'Logout successful']);
     }
 
-    public function user()
+    public function getUser()
     {
-        return response()->json(auth()->user());
+        if (!auth()->user()) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+        return new UserResource(auth()->user());
     }
 }
