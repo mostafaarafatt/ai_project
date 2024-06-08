@@ -36,7 +36,7 @@ class AccountService
 
         // Send the code via email
         $user = User::where('email', $email)->first();
-        $user->sendVerificationCodeNotification($code);
+//        $user->sendVerificationCodeNotification($code);
 
         return $code;
     }
