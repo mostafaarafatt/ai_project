@@ -48,7 +48,7 @@ class DiseasePredictionController extends Controller
 
     public function getSymptoms()
     {
-        $symptoms = Symptom::paginate(10);
+        $symptoms = Symptom::all();
         return SymptomResource::collection($symptoms);
     }
 
