@@ -36,13 +36,21 @@ class DiseasePredictionController extends Controller
         // Sort scores in descending order
         arsort($diseaseScores);
 
+        // Get the top three scores
+        $topThreeDiseaseScores = array_slice($diseaseScores, 1, 3, true);
+
+        // Convert associative array to indexed array
+        $diseaseScoresArray = [];
+        foreach ($topThreeDiseaseScores as $disease => $score) {
+            $diseaseScoresArray[] = ['disease' => $disease, 'score' => $score];
+        }
+
         // Find the disease with the highest score
         $finalPrediction = array_keys($diseaseScores, max($diseaseScores))[0];
 
         return response()->json([
             'final_prediction' => __($finalPrediction),
-            'scores' => $diseaseScores,
-
+            'scores' => $diseaseScoresArray,
         ]);
     }
 
