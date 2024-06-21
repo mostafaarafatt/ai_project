@@ -42,7 +42,7 @@ class DiseasePredictionController extends Controller
         // Convert associative array to indexed array
         $diseaseScoresArray = [];
         foreach ($topThreeDiseaseScores as $disease => $score) {
-            $diseaseScoresArray[] = ['disease' => $disease, 'score' => $score];
+            $diseaseScoresArray[] = ['disease' => __($disease), 'score' => $score];
         }
 
         // Find the disease with the highest score
